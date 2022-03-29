@@ -5,7 +5,7 @@ The [rector/rector](http://github.com/rectorphp/rector) rules for BEAR.Sunday.
 ## Install
 
 ```bash
-composer require rector/bear-sunday 1.x-dev --dev
+composer require bearsunday/rector-bearsunday 1.x-dev --dev
 ```
 
 ## Use Sets
