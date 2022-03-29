@@ -29,6 +29,8 @@ class SomeClass
 {
     /**
      * @Named("a=foo,b=bar")
+     * @Foo
+     */
     public function __construct(int $a, int $b)
     {
     }
@@ -38,7 +40,8 @@ CODE_SAMPLE
         // code after change
         \Rector\RectorGenerator\ValueObject\Option::CODE_AFTER => <<<'CODE_SAMPLE'
     /**
-     * @Named("a=name1,b=name2")
+     * @Foo
+     */
     public function __construct(#[Named('foo') int $a, #[Named('bar') int $b)
     {
     }
