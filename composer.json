@@ -10,9 +10,8 @@
             "Utils\\Rector\\": "utils/rector/src",
             "Utils\\Rector\\Tests\\": "utils/rector/tests"
         },
-        "files": [
-            "rules-tests/RayDiNamedAnnotation/Rector/ClassMethod/RayDiNamedAnnotationRector/Fake/Foo.php",
-            "rules-tests/RayDiNamedAnnotation/Rector/ClassMethod/RayDiNamedAnnotationRector/Fake/SomeClass.php"
+        "classmap": [
+            "rules-tests/RayDiNamedAnnotation/Rector/ClassMethod/RayDiNamedAnnotationRector/Fake/"
         ]
     },
     "require": {
