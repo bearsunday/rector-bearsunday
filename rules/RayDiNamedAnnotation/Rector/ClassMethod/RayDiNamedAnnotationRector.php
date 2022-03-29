@@ -4,37 +4,31 @@ declare (strict_types=1);
 
 namespace Rector\BearSunday\RayDiNamedAnnotation\Rector\ClassMethod;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Koriym\Attributes\AttributeReader;
-use Koriym\Attributes\DualReader;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use Ray\Di\Di\Named;
-use Ray\Di\Name;
 use Rector\BetterPhpDocParser\PhpDoc\DoctrineAnnotationTagValueNode;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
 use Rector\Core\Rector\AbstractRector;
 use Rector\PhpAttribute\Printer\PhpAttributeGroupFactory;
-use ReflectionMethod;
-use ReflectionParameter;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use function array_merge;
+use function assert;
+use function explode;
+use function is_string;
+use function substr;
+use function trim;
 
 /**
  * @see \Rector\Tests\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector\RayDiNamedAnnotationRectorTest
  */
 final class RayDiNamedAnnotationRector extends AbstractRector
 {
-    private DualReader $reader;
-
     public function __construct(
-        private PhpAttributeGroupFactory                                      $attributeGroupFactory,
+        private PhpAttributeGroupFactory $attributeGroupFactory,
         private PhpDocTagRemover $phpDocTagRemove
-    )
-    {
-        $this->reader = new DualReader(new AnnotationReader(), new AttributeReader());
-    }
+    ){}
 
     public function getRuleDefinition(): RuleDefinition
     {
@@ -77,31 +71,47 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         assert($node instanceof ClassMethod);
-        $class = $node->getAttributes()['parent']->name->name;
-        $method = new ReflectionMethod($class, $node->name->name);
-        $named = $this->reader->getMethodAnnotation($method, Named::class);
-        if (!$named instanceof Named) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        $doctrineTagValueNode = $phpDocInfo->getByAnnotationClass(Named::class);
+        if (! $doctrineTagValueNode instanceof DoctrineAnnotationTagValueNode) {
             return null;
         }
-
-        $name = new Name($named->value);
+        $nameString = $doctrineTagValueNode->getValuesWithExplicitSilentAndWithoutQuotes()[0];
+        $names = $this->parseName($nameString);
         foreach ($node->params as $param) {
-            $namedString = ($name)(new ReflectionParameter([$class, $method->name], $param->var->name));
-            if ($namedString === '') {
+            $varName = $param->var->name;
+            if (! isset($names[$varName])) {
                 continue;
             }
-            $attrGroupsFromNamedAnnotation = $this->attributeGroupFactory->createFromClassWithItems(Named::class, [$namedString]);
+            $attrGroupsFromNamedAnnotation = $this->attributeGroupFactory->createFromClassWithItems(Named::class, [$names[$varName]]);
             $param->attrGroups = array_merge($param->attrGroups, [$attrGroupsFromNamedAnnotation]);
 
-            $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
-            $doctrineAnnotationTagValueNode = $phpDocInfo->getByAnnotationClass(Named::class);
-            if (! $doctrineAnnotationTagValueNode instanceof DoctrineAnnotationTagValueNode) {
-                continue;
-            }
-
-            $this->phpDocTagRemove->removeTagValueFromNode($phpDocInfo, $doctrineAnnotationTagValueNode);
+            $this->phpDocTagRemove->removeTagValueFromNode($phpDocInfo, $doctrineTagValueNode);
         }
 
         return $node;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function parseName(string $name): array
+    {
+        $names = [];
+        $keyValues = explode(',', $name);
+        foreach ($keyValues as $keyValue) {
+            $exploded = explode('=', $keyValue);
+            if (isset($exploded[1])) {
+                [$key, $value] = $exploded;
+                assert(is_string($key));
+                if (isset($key[0]) && $key[0] === '$') {
+                    $key = substr($key, 1);
+                }
+
+                $names[trim($key)] = trim($value);
+            }
+        }
+
+        return $names;
     }
 }

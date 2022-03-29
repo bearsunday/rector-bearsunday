@@ -1,5 +1,7 @@
 <?php
 
+namespace Rector\Tests\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector\Fixture;
+
 class NoneNamed
 {
     /**
