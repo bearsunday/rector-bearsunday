@@ -2,7 +2,7 @@
 
 use Ray\Di\Di\Named;
 
-class NotNamed
+class PartiallyNamed
 {
     /**
      * @Named("a=foo,b=bar")
