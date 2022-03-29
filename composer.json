@@ -9,14 +9,20 @@
         "psr-4": {
             "Utils\\Rector\\": "utils/rector/src",
             "Utils\\Rector\\Tests\\": "utils/rector/tests"
-        }
+        },
+        "files": [
+            "rules-tests/RayDiNamedAnnotation/Rector/ClassMethod/RayDiNamedAnnotationRector/Fake/Foo.php",
+            "rules-tests/RayDiNamedAnnotation/Rector/ClassMethod/RayDiNamedAnnotationRector/Fake/SomeClass.php"
+        ]
     },
     "require": {
         "rector/rector": "^0.12.19",
         "nette/utils": "^3.2",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "koriym/attributes": "^1.0",
+        "ray/di": "^2.14"
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit rules-tests/RayNamedAnnotation/Rector/Class_/RayNamedAnnotationRector"
+        "test": "./vendor/bin/phpunit rules-tests/RayDiNamedAnnotation/Rector/ClassMethod/RayDiNamedAnnotationRector"
     }
 }
