@@ -36,7 +36,6 @@ Change `@Named` annotation in method to `#[Named]` attribute in parameter.
 class SomeClass
 {
     /**
-     * @Named("a=foo, b=bar")
 -    * @Named("a=foo, b=bar")
      * @Foo
      */
