@@ -10,15 +10,13 @@ composer require rector/bear-sunday 1.x-dev --dev
 
 ## Use Sets
 
-
 ```php
 <?php
 // rector.php
-
-declare(strict_types=1);
-
 use Rector\BearSunday\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+require __DIR__ . '/vendor/autoload.php';
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
