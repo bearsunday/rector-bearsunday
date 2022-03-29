@@ -2,7 +2,7 @@
 
 declare (strict_types=1);
 
-namespace Rector\RayDiNamedAnnotation\Rector\ClassMethod;
+namespace Rector\BearSunday\RayDiNamedAnnotation\Rector\ClassMethod;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Koriym\Attributes\AttributeReader;
