@@ -46,7 +46,7 @@ class SomeClass
      * @Foo
      */
 -    public function __construct(int $a, int $b)
-+    public function __construct(#[Named('foo') int $a, #[Named('bar') int $b)
++    public function __construct(#[Named('foo')] int $a, #[Named('bar')] int $b)
     {
     }
 ```
