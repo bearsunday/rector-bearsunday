@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Rector\BearSunday\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector;
 use Rector\Core\Configuration\Option;
+use Rector\Ray\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 require __DIR__ . '/vendor/autoload.php';
