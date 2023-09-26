@@ -30,25 +30,33 @@ use Ray\Query\Annotation\Query;
 use Ray\RoleModule\Annotation\RequiresRoles;
 use Ray\WebContextParam\Annotation\CookieParam;
 use Ray\WebContextParam\Annotation\EnvParam;
+use Ray\WebContextParam\Annotation\FilesParam;
 use Ray\WebContextParam\Annotation\FormParam;
 use Ray\WebContextParam\Annotation\QueryParam;
 use Ray\WebContextParam\Annotation\ServerParam;
 use Rector\BearSunday\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector;
 use Rector\Config\RectorConfig;
-use Rector\Core\Configuration\Option;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
 use Rector\Php80\ValueObject\AnnotationToAttribute;
 
 require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/vendor-bin/rector/vendor/autoload.php';
 
 return static function (RectorConfig $rectorConfig): void {
+    $services = $rectorConfig->services();
+    $rectorConfig->paths([
+        __DIR__ . '/src',
+        __DIR__ . '/tests',
+    ]);
+
+    // Update @Named method annotations to #[Named] parameter attributes
+    $services->set(RayDiNamedAnnotationRector::class);
 
     $rectorConfig->ruleWithConfiguration(AnnotationToAttributeRector::class, [
         // ray/aura-sql-module
         new AnnotationToAttribute(ReadOnlyConnection::class),
         new AnnotationToAttribute(WriteConnection::class),
         new AnnotationToAttribute(Transactional::class),
-
         // ray/di
         new AnnotationToAttribute(Assisted::class),
         new AnnotationToAttribute(Inject::class),
@@ -56,10 +64,6 @@ return static function (RectorConfig $rectorConfig): void {
         new AnnotationToAttribute(PostConstruct::class),
         new AnnotationToAttribute(Set::class),
         new AnnotationToAttribute(Qualifier::class),
-        // bear/query-repository
-        new AnnotationToAttribute(Cacheable::class),
-        new AnnotationToAttribute(Purge::class),
-        new AnnotationToAttribute(Refresh::class),
         // ray/psr-cache-module
         new AnnotationToAttribute(CacheNamespace::class),
         new AnnotationToAttribute(Local::class),
@@ -67,22 +71,27 @@ return static function (RectorConfig $rectorConfig): void {
         new AnnotationToAttribute(CacheDir::class),
         new AnnotationToAttribute(AppName::class),
         new AnnotationToAttribute(ContextScheme::class),
+        // ray/role-module
+        new AnnotationToAttribute(RequiresRoles::class),
+        // ray/web-context
+        new AnnotationToAttribute(CookieParam::class),
+        new AnnotationToAttribute(EnvParam::class),
+        new AnnotationToAttribute(FilesParam::class),
+        new AnnotationToAttribute(FormParam::class),
+        new AnnotationToAttribute(QueryParam::class),
+        new AnnotationToAttribute(ServerParam::class),
+        new AnnotationToAttribute(ReturnCreatedResource::class),
+
+        // bear/query-module
+        new AnnotationToAttribute(Query::class),
+        // bear/query-repository
+        new AnnotationToAttribute(Cacheable::class),
+        new AnnotationToAttribute(Purge::class),
+        new AnnotationToAttribute(Refresh::class),
         // bear/resource
         new AnnotationToAttribute(Embed::class),
         new AnnotationToAttribute(ImportAppConfig::class),
         new AnnotationToAttribute(Link::class),
         new AnnotationToAttribute(OptionsBody::class),
         new AnnotationToAttribute(ResourceParam::class),
-        // ray/web-context
-        new AnnotationToAttribute(CookieParam::class),
-        new AnnotationToAttribute(EnvParam::class),
-        new AnnotationToAttribute(\Ray\WebContextParam\Annotation\FilesParam::class),
-        new AnnotationToAttribute(FormParam::class),
-        new AnnotationToAttribute(QueryParam::class),
-        new AnnotationToAttribute(ServerParam::class),
-        new AnnotationToAttribute(ReturnCreatedResource::class),
-
-    ]);
-
-    $rectorConfig->sets([RayDiNamedAnnotationRector::class]);
 };
