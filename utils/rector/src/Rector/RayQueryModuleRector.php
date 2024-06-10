@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Utils\Rector\Rector;
 
 use PhpParser\Node;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
-/**
- * @see \Utils\Rector\Tests\Rector\RayQueryModuleRector\RayQueryModuleRectorTest
- */
+/** @see \Utils\Rector\Tests\Rector\RayQueryModuleRector\RayQueryModuleRectorTest */
 final class RayQueryModuleRector extends AbstractRector
 {
     public function getRuleDefinition(): RuleDefinition
@@ -29,22 +29,36 @@ CODE_SAMPLE
         ]);
     }
 
-    /**
-     * @return array<class-string<Node>>
-     */
+    /** @return array<class-string<Node>> */
     public function getNodeTypes(): array
     {
-        // @todo select node type
-        return [\PhpParser\Node\Stmt\Class_::class];
+        return [ClassMethod::class];
     }
 
-    /**
-     * @param \PhpParser\Node\Stmt\Class_ $node
-     */
+    /** @param Class_ $node */
     public function refactor(Node $node): ?Node
     {
-        // @todo change the node
+        $params = $node->params;
+        foreach ($params as $param) {
+            $this->changeSqlAttribute($param);
+        }
 
         return $node;
+    }
+
+    function changeSqlAttribute(Node\Param $param): void
+    {
+        // Check if the parameter type is RowInterface
+        if ($param->type instanceof Node\Name\FullyQualified && $param->type->toString() === 'Ray\Query\RowInterface') {
+            // Check if the parameter has Named attribute
+            foreach ($param->attrGroups as $attrGroup) {
+                foreach ($attrGroup->attrs as $attr) {
+                    if ($attr->name->toString() === 'Ray\Di\Di\Named') {
+                        // Change the attribute name to Sql
+                        $attr->name = new Node\Name('\Ray\Query\Annotation\Sql');
+                    }
+                }
+            }
+        }
     }
 }
