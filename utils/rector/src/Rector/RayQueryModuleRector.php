@@ -40,25 +40,39 @@ CODE_SAMPLE
     {
         $params = $node->params;
         foreach ($params as $param) {
-            $this->changeSqlAttribute($param);
+            $this->rectorParam($param);
         }
 
         return $node;
     }
 
-    function changeSqlAttribute(Node\Param $param): void
+    function rectorParam(Node\Param $param): void
     {
         // Check if the parameter type is RowInterface
-        if ($param->type instanceof Node\Name\FullyQualified
+        if (
+            $param->type instanceof Node\Name\FullyQualified
             && $param->type->toString() === 'Ray\Query\RowInterface'
-            || $param->type->toString() === 'Ray\Query\RowListInterface') {
+            || $param->type->toString() === 'Ray\Query\RowListInterface'
+        ) {
             // Check if the parameter has Named attribute
-            foreach ($param->attrGroups as $attrGroup) {
-                foreach ($attrGroup->attrs as $attr) {
-                    if ($attr->name->toString() === 'Ray\Di\Di\Named') {
-                        // Change the attribute name to Sql
-                        $attr->name = new Node\Name('\Ray\Query\Annotation\Sql');
-                    }
+            $this->changeSqlAttr($param);
+        }
+
+        if ($param->type->name === 'callable') {
+            $this->changeSqlAttr($param);
+            $param->type = new Node\Name('\Ray\Query\InvokeInterface');
+        }
+    }
+
+    public function changeSqlAttr(Node\Param $param): void
+    {
+        foreach ($param->attrGroups as $attrGroup) {
+            foreach ($attrGroup->attrs as $attr) {
+                if ($attr->name->toString() === 'Ray\Di\Di\Named') {
+                    // Change the attribute name to Sql
+                    $attr->name = new Node\Name('\Ray\Query\Annotation\Sql');
+
+                    return;
                 }
             }
         }
