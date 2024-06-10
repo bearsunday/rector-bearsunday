@@ -49,7 +49,9 @@ CODE_SAMPLE
     function changeSqlAttribute(Node\Param $param): void
     {
         // Check if the parameter type is RowInterface
-        if ($param->type instanceof Node\Name\FullyQualified && $param->type->toString() === 'Ray\Query\RowInterface') {
+        if ($param->type instanceof Node\Name\FullyQualified
+            && $param->type->toString() === 'Ray\Query\RowInterface'
+            || $param->type->toString() === 'Ray\Query\RowListInterface') {
             // Check if the parameter has Named attribute
             foreach ($param->attrGroups as $attrGroup) {
                 foreach ($attrGroup->attrs as $attr) {
