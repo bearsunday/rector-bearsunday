@@ -12,5 +12,19 @@
             "Utils\\Rector\\": "utils/rector/src",
             "Utils\\Rector\\Tests\\": "utils/rector/tests"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10",
+        "ray/query-module": "^1.x-dev",
+        "doctrine/coding-standard": "^12.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs-fix": ["./vendor/bin/phpcbf --standard=./phpcs.xml utils/rector/src"]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
