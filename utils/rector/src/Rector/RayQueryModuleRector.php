@@ -10,6 +10,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
+use TypeError;
 
 /** @see \Utils\Rector\Tests\Rector\RayQueryModuleRector\RayQueryModuleRectorTest */
 final class RayQueryModuleRector extends AbstractRector
@@ -51,8 +52,8 @@ CODE_SAMPLE
         // Check if the parameter type is RowInterface
         if (
             $param->type instanceof Node\Name\FullyQualified
-            && $param->type->toString() === 'Ray\Query\RowInterface'
-            || $param->type->toString() === 'Ray\Query\RowListInterface'
+            && (! $param->type instanceof Node\UnionType)
+            && ($param->type->toString() === 'Ray\Query\RowInterface' || $param->type->toString() === 'Ray\Query\RowListInterface')
         ) {
             // Check if the parameter has Named attribute
             $this->changeSqlAttr($param);
