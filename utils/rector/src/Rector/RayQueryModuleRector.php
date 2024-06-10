@@ -12,6 +12,9 @@ use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use TypeError;
 
+use function array_filter;
+use function array_values;
+
 /** @see \Utils\Rector\Tests\Rector\RayQueryModuleRector\RayQueryModuleRectorTest */
 final class RayQueryModuleRector extends AbstractRector
 {
@@ -41,13 +44,13 @@ CODE_SAMPLE
     {
         $params = $node->params;
         foreach ($params as $param) {
-            $this->rectorParam($param);
+            $this->rectorParam($param, $node);
         }
 
         return $node;
     }
 
-    function rectorParam(Node\Param $param): void
+    function rectorParam(Node\Param $param, Node|Class_ $class): void
     {
         // Check if the parameter type is RowInterface
         if (
@@ -55,23 +58,58 @@ CODE_SAMPLE
             && (! $param->type instanceof Node\UnionType)
             && ($param->type->toString() === 'Ray\Query\RowInterface' || $param->type->toString() === 'Ray\Query\RowListInterface')
         ) {
-            // Check if the parameter has Named attribute
-            $this->changeSqlAttr($param);
+            $this->changeSqlAttr($param, $class);
+
+            return;
         }
 
         if ($param->type->name === 'callable') {
-            $this->changeSqlAttr($param);
+            $this->changeSqlAttr($param, $class);
             $param->type = new Node\Name('\Ray\Query\InvokeInterface');
         }
     }
 
-    public function changeSqlAttr(Node\Param $param): void
+    public function changeSqlAttr(Node\Param $param, Node|Class_ $class): void
     {
+        // Check if the parameter has Named attribute
         foreach ($param->attrGroups as $attrGroup) {
             foreach ($attrGroup->attrs as $attr) {
                 if ($attr->name->toString() === 'Ray\Di\Di\Named') {
                     // Change the attribute name to Sql
                     $attr->name = new Node\Name('\Ray\Query\Annotation\Sql');
+
+                    return;
+                }
+            }
+        }
+
+        $this->MethodNamedAttr($param, $class);
+    }
+
+    public function MethodNamedAttr(Node\Param $param, Node|Class_ $node): void
+    {
+        foreach ($node->attrGroups as $attrGroup) {
+            foreach ($attrGroup->attrs as $attr) {
+                if ($attr->name->toString() === 'Ray\Di\Di\Named') {
+                    $named = $attr->args[0]->value->value;
+                    // Create a Sql attribute
+                    $attribute = new Node\Attribute(
+                        new Node\Name('\Ray\Query\Annotation\Sql'),
+                        [new Node\Arg(new Node\Scalar\String_($named))]
+                    );
+
+                    // Add the attribute to the parameter
+                    $param->attrGroups[] = new Node\AttributeGroup([$attribute]);
+
+                    // Remove the Named attribute from the class
+                    $attrGroup->attrs = array_values(array_filter($attrGroup->attrs, static function ($attr) {
+                        return $attr->name->toString() !== 'Ray\Di\Di\Named';
+                    }));
+
+                    // If the attrs array is empty, remove the attrGroup
+                    if (empty($attrGroup->attrs)) {
+                        $node->attrGroups = [];
+                    }
 
                     return;
                 }
