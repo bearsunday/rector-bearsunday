@@ -16,14 +16,14 @@ final class RayQueryModuleRector extends AbstractRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
-        return new RuleDefinition('// @todo fill the description', [
+        return new RuleDefinition('Change #[Named] to #[Sql] in Ray.QueryModule', [
             new CodeSample(
                 <<<'CODE_SAMPLE'
-// @todo fill code before
+#[Named('add_todo_item')] callable $todo
 CODE_SAMPLE
                 ,
                 <<<'CODE_SAMPLE'
-// @todo fill code after
+#[\Ray\Query\Annotation\Sql('todo_item_by_id')] \Ray\Query\InvokeInterface $todo
 CODE_SAMPLE
             ),
         ]);
