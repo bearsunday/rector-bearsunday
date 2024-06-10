@@ -6,5 +6,11 @@
     "require": {
         "php": "^8.1",
         "rector/rector": "^1.1"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Utils\\Rector\\": "utils/rector/src",
+            "Utils\\Rector\\Tests\\": "utils/rector/tests"
+        }
     }
 }
