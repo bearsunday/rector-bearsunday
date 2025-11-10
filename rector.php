@@ -2,96 +2,56 @@
 
 declare(strict_types=1);
 
-use BEAR\Package\Annotation\ReturnCreatedResource;
-use BEAR\RepositoryModule\Annotation\Cacheable;
-use BEAR\RepositoryModule\Annotation\Purge;
-use BEAR\RepositoryModule\Annotation\Refresh;
-use BEAR\Resource\Annotation\AppName;
-use BEAR\Resource\Annotation\ContextScheme;
-use BEAR\Resource\Annotation\Embed;
-use BEAR\Resource\Annotation\ImportAppConfig;
-use BEAR\Resource\Annotation\Link;
-use BEAR\Resource\Annotation\OptionsBody;
-use BEAR\Resource\Annotation\ResourceParam;
-use Ray\AuraSqlModule\Annotation\ReadOnlyConnection;
-use Ray\AuraSqlModule\Annotation\Transactional;
-use Ray\AuraSqlModule\Annotation\WriteConnection;
-use Ray\Di\Di\Assisted;
-use Ray\Di\Di\Inject;
-use Ray\Di\Di\Named;
-use Ray\Di\Di\PostConstruct;
-use Ray\Di\Di\Qualifier;
-use Ray\Di\Di\Set;
-use Ray\PsrCacheModule\Annotation\CacheDir;
-use Ray\PsrCacheModule\Annotation\CacheNamespace;
-use Ray\PsrCacheModule\Annotation\Local;
-use Ray\PsrCacheModule\Annotation\Shared;
-use Ray\Query\Annotation\Query;
-use Ray\RoleModule\Annotation\RequiresRoles;
-use Ray\WebContextParam\Annotation\CookieParam;
-use Ray\WebContextParam\Annotation\EnvParam;
-use Ray\WebContextParam\Annotation\FilesParam;
-use Ray\WebContextParam\Annotation\FormParam;
-use Ray\WebContextParam\Annotation\QueryParam;
-use Ray\WebContextParam\Annotation\ServerParam;
 use Rector\BearSunday\RayDiNamedAnnotation\Rector\ClassMethod\RayDiNamedAnnotationRector;
 use Rector\Config\RectorConfig;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
 use Rector\Php80\ValueObject\AnnotationToAttribute;
 
-require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/vendor-bin/rector/vendor/autoload.php';
-
-return static function (RectorConfig $rectorConfig): void {
-    $services = $rectorConfig->services();
-    $rectorConfig->paths([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
-    ]);
-
+return RectorConfig::configure()
     // Update @Named method annotations to #[Named] parameter attributes
-    $services->set(RayDiNamedAnnotationRector::class);
-
-    $rectorConfig->ruleWithConfiguration(AnnotationToAttributeRector::class, [
+    ->withRules([
+        RayDiNamedAnnotationRector::class,
+    ])
+    ->withConfiguredRule(AnnotationToAttributeRector::class, [
         // ray/aura-sql-module
-        new AnnotationToAttribute(ReadOnlyConnection::class),
-        new AnnotationToAttribute(WriteConnection::class),
-        new AnnotationToAttribute(Transactional::class),
+        new AnnotationToAttribute('Ray\AuraSqlModule\Annotation\ReadOnlyConnection'),
+        new AnnotationToAttribute('Ray\AuraSqlModule\Annotation\WriteConnection'),
+        new AnnotationToAttribute('Ray\AuraSqlModule\Annotation\Transactional'),
         // ray/di
-        new AnnotationToAttribute(Assisted::class),
-        new AnnotationToAttribute(Inject::class),
-        new AnnotationToAttribute(Named::class),
-        new AnnotationToAttribute(PostConstruct::class),
-        new AnnotationToAttribute(Set::class),
-        new AnnotationToAttribute(Qualifier::class),
+        new AnnotationToAttribute('Ray\Di\Di\Assisted'),
+        new AnnotationToAttribute('Ray\Di\Di\Inject'),
+        new AnnotationToAttribute('Ray\Di\Di\Named'),
+        new AnnotationToAttribute('Ray\Di\Di\PostConstruct'),
+        new AnnotationToAttribute('Ray\Di\Di\Set'),
+        new AnnotationToAttribute('Ray\Di\Di\Qualifier'),
         // ray/psr-cache-module
-        new AnnotationToAttribute(CacheNamespace::class),
-        new AnnotationToAttribute(Local::class),
-        new AnnotationToAttribute(Shared::class),
-        new AnnotationToAttribute(CacheDir::class),
-        new AnnotationToAttribute(AppName::class),
-        new AnnotationToAttribute(ContextScheme::class),
+        new AnnotationToAttribute('Ray\PsrCacheModule\Annotation\CacheNamespace'),
+        new AnnotationToAttribute('Ray\PsrCacheModule\Annotation\Local'),
+        new AnnotationToAttribute('Ray\PsrCacheModule\Annotation\Shared'),
+        new AnnotationToAttribute('Ray\PsrCacheModule\Annotation\CacheDir'),
+        new AnnotationToAttribute('BEAR\Resource\Annotation\AppName'),
+        new AnnotationToAttribute('BEAR\Resource\Annotation\ContextScheme'),
         // ray/role-module
-        new AnnotationToAttribute(RequiresRoles::class),
+        new AnnotationToAttribute('Ray\RoleModule\Annotation\RequiresRoles'),
         // ray/web-context
-        new AnnotationToAttribute(CookieParam::class),
-        new AnnotationToAttribute(EnvParam::class),
-        new AnnotationToAttribute(FilesParam::class),
-        new AnnotationToAttribute(FormParam::class),
-        new AnnotationToAttribute(QueryParam::class),
-        new AnnotationToAttribute(ServerParam::class),
-        new AnnotationToAttribute(ReturnCreatedResource::class),
+        new AnnotationToAttribute('Ray\WebContextParam\Annotation\CookieParam'),
+        new AnnotationToAttribute('Ray\WebContextParam\Annotation\EnvParam'),
+        new AnnotationToAttribute('Ray\WebContextParam\Annotation\FilesParam'),
+        new AnnotationToAttribute('Ray\WebContextParam\Annotation\FormParam'),
+        new AnnotationToAttribute('Ray\WebContextParam\Annotation\QueryParam'),
+        new AnnotationToAttribute('Ray\WebContextParam\Annotation\ServerParam'),
+        new AnnotationToAttribute('BEAR\Package\Annotation\ReturnCreatedResource'),
 
         // bear/query-module
-        new AnnotationToAttribute(Query::class),
+        new AnnotationToAttribute('Ray\Query\Annotation\Query'),
         // bear/query-repository
-        new AnnotationToAttribute(Cacheable::class),
-        new AnnotationToAttribute(Purge::class),
-        new AnnotationToAttribute(Refresh::class),
+        new AnnotationToAttribute('BEAR\RepositoryModule\Annotation\Cacheable'),
+        new AnnotationToAttribute('BEAR\RepositoryModule\Annotation\Purge'),
+        new AnnotationToAttribute('BEAR\RepositoryModule\Annotation\Refresh'),
         // bear/resource
-        new AnnotationToAttribute(Embed::class),
-        new AnnotationToAttribute(ImportAppConfig::class),
-        new AnnotationToAttribute(Link::class),
-        new AnnotationToAttribute(OptionsBody::class),
-        new AnnotationToAttribute(ResourceParam::class),
-};
+        new AnnotationToAttribute('BEAR\Resource\Annotation\Embed'),
+        new AnnotationToAttribute('BEAR\Resource\Annotation\ImportAppConfig'),
+        new AnnotationToAttribute('BEAR\Resource\Annotation\Link'),
+        new AnnotationToAttribute('BEAR\Resource\Annotation\OptionsBody'),
+        new AnnotationToAttribute('BEAR\Resource\Annotation\ResourceParam'),
+    ]);

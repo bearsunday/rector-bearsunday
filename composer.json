@@ -4,8 +4,8 @@
     "license": "MIT",
     "description": "Rector upgrades rules for BEAR.Sunday Framework",
     "require": {
-        "php": "^8.0",
-        "rector/rector": "^0.12.19",
+        "php": "^8.2",
+        "rector/rector": "^2.0",
         "koriym/attributes": "^1.0",
         "ray/di": "^2.14"
     },

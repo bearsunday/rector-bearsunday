@@ -8,9 +8,12 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use Ray\Di\Di\Named;
 use Rector\BetterPhpDocParser\PhpDoc\DoctrineAnnotationTagValueNode;
+use Rector\BetterPhpDocParser\PhpDoc\StringNode;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
-use Rector\Core\Rector\AbstractRector;
-use Rector\PhpAttribute\Printer\PhpAttributeGroupFactory;
+use Rector\Comments\NodeDocBlock\DocBlockUpdater;
+use Rector\Rector\AbstractRector;
+use Rector\PhpAttribute\NodeFactory\PhpAttributeGroupFactory;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use function array_merge;
@@ -27,7 +30,9 @@ final class RayDiNamedAnnotationRector extends AbstractRector
 {
     public function __construct(
         private PhpAttributeGroupFactory $attributeGroupFactory,
-        private PhpDocTagRemover $phpDocTagRemove
+        private PhpDocTagRemover $phpDocTagRemover,
+        private PhpDocInfoFactory $phpDocInfoFactory,
+        private DocBlockUpdater $docBlockUpdater
     ){}
 
     public function getRuleDefinition(): RuleDefinition
@@ -76,8 +81,18 @@ CODE_SAMPLE
         if (! $doctrineTagValueNode instanceof DoctrineAnnotationTagValueNode) {
             return null;
         }
-        $nameString = $doctrineTagValueNode->getValuesWithExplicitSilentAndWithoutQuotes()[0];
+        $silentValue = $doctrineTagValueNode->getSilentValue();
+        if ($silentValue === null) {
+            return null;
+        }
+
+        // Get the string value from StringNode or directly
+        $value = $silentValue->value;
+        $nameString = $value instanceof StringNode ? $value->value : (string) $value;
+
         $names = $this->parseName($nameString);
+        $hasChanged = false;
+
         foreach ($node->params as $param) {
             $varName = $param->var->name;
             if (! isset($names[$varName])) {
@@ -85,9 +100,18 @@ CODE_SAMPLE
             }
             $attrGroupsFromNamedAnnotation = $this->attributeGroupFactory->createFromClassWithItems(Named::class, [$names[$varName]]);
             $param->attrGroups = array_merge($param->attrGroups, [$attrGroupsFromNamedAnnotation]);
-
-            $this->phpDocTagRemove->removeTagValueFromNode($phpDocInfo, $doctrineTagValueNode);
+            $hasChanged = true;
         }
+
+        if (! $hasChanged) {
+            return null;
+        }
+
+        // Remove the @Named annotation from the docblock after processing all parameters
+        $phpDocInfo->removeByName('@Named');
+
+        // Update the node with the modified PhpDocInfo
+        $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
 
         return $node;
     }
