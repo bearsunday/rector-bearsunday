@@ -28,7 +28,9 @@ class SomeClass
     /**
      * @Foo
      */
-    public function __construct(#[\Ray\Di\Di\Named('foo')] int $a, #[\Ray\Di\Di\Named('bar')] int $b)
+    public function __construct(#[\Ray\Di\Di\Named('foo')]
+    int $a, #[\Ray\Di\Di\Named('bar')]
+    int $b)
     {
     }
 }

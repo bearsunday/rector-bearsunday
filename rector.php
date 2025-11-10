@@ -39,20 +39,12 @@ use Rector\Config\RectorConfig;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
 use Rector\Php80\ValueObject\AnnotationToAttribute;
 
-require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/vendor-bin/rector/vendor/autoload.php';
-
-return static function (RectorConfig $rectorConfig): void {
-    $services = $rectorConfig->services();
-    $rectorConfig->paths([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
-    ]);
-
+return RectorConfig::configure()
     // Update @Named method annotations to #[Named] parameter attributes
-    $services->set(RayDiNamedAnnotationRector::class);
-
-    $rectorConfig->ruleWithConfiguration(AnnotationToAttributeRector::class, [
+    ->withRules([
+        RayDiNamedAnnotationRector::class,
+    ])
+    ->withConfiguredRule(AnnotationToAttributeRector::class, [
         // ray/aura-sql-module
         new AnnotationToAttribute(ReadOnlyConnection::class),
         new AnnotationToAttribute(WriteConnection::class),
@@ -94,4 +86,4 @@ return static function (RectorConfig $rectorConfig): void {
         new AnnotationToAttribute(Link::class),
         new AnnotationToAttribute(OptionsBody::class),
         new AnnotationToAttribute(ResourceParam::class),
-};
+    ]);
