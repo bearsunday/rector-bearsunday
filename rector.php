@@ -54,4 +54,7 @@ return RectorConfig::configure()
         new AnnotationToAttribute('BEAR\Resource\Annotation\Link'),
         new AnnotationToAttribute('BEAR\Resource\Annotation\OptionsBody'),
         new AnnotationToAttribute('BEAR\Resource\Annotation\ResourceParam'),
+        // bear/accept
+        new AnnotationToAttribute('BEAR\Accept\Annotation\Available'),
+        new AnnotationToAttribute('BEAR\Accept\Annotation\Produces'),
     ]);

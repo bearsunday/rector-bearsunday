@@ -112,6 +112,10 @@ The provided `rector.php` configuration includes rules for:
 - `@Purge` → `#[Purge]`
 - `@Refresh` → `#[Refresh]`
 
+**BEAR.Accept:**
+- `@Available` → `#[Available]`
+- `@Produces` → `#[Produces]`
+
 ## See Also
 
 - [Rector - Instant PHP Upgrades](https://getrector.com/)
