@@ -116,6 +116,93 @@ The provided `rector.php` configuration includes rules for:
 - `@Available` → `#[Available]`
 - `@Produces` → `#[Produces]`
 
+### SetterToConstructorInjectionRector
+
+Converts setter injection with `#[Inject]` to constructor injection.
+
+**Before:**
+```php
+class SomeClass
+{
+    private FooInterface $foo;
+
+    #[Inject]
+    public function setFoo(FooInterface $foo): void
+    {
+        $this->foo = $foo;
+    }
+}
+```
+
+**After:**
+```php
+class SomeClass
+{
+    public function __construct(
+        private readonly FooInterface $foo
+    ) {
+    }
+}
+```
+
+### TraitToConstructorInjectionRector
+
+Converts trait-based injection to constructor injection.
+
+**Supported traits:**
+- `BEAR\Resource\ResourceInject` → `ResourceInterface $resource`
+- `BEAR\Sunday\Inject\ResourceInject` → `ResourceInterface $resource`
+- `Ray\Di\InjectorInject` → `InjectorInterface $injector`
+
+**Before:**
+```php
+use BEAR\Resource\ResourceInject;
+
+class SomeClass
+{
+    use ResourceInject;
+}
+```
+
+**After:**
+```php
+use BEAR\Resource\ResourceInterface;
+
+class SomeClass
+{
+    public function __construct(
+        private readonly ResourceInterface $resource
+    ) {
+    }
+}
+```
+
+### ResourceObjectReturnTypeRector
+
+Converts `ResourceObject` and `self` return types to `static` in resource methods.
+
+**Before:**
+```php
+class Article extends ResourceObject
+{
+    public function onGet(int $id): ResourceObject
+    {
+        return $this;
+    }
+}
+```
+
+**After:**
+```php
+class Article extends ResourceObject
+{
+    public function onGet(int $id): static
+    {
+        return $this;
+    }
+}
+```
+
 ## See Also
 
 - [Rector - Instant PHP Upgrades](https://getrector.com/)
