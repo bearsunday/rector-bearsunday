@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Rector extension that provides upgrade rules for BEAR.Sunday framework, specifically for migrating from docblock annotations to PHP 8 attributes. The main rule (`RayDiNamedAnnotationRector`) converts `@Named` annotations on methods to `#[Named]` attributes on constructor parameters.
+This is a Rector extension that provides upgrade rules for BEAR.Sunday framework:
+
+1. **Annotation to Attribute migration** - Converting docblock annotations to PHP 8 attributes
+2. **Dependency Injection refactoring** - Converting setter/trait injection to constructor injection
+3. **Return type modernization** - Converting `ResourceObject` return types to `static`
 
 ## Development Commands
 
@@ -47,6 +51,15 @@ Note: When installed via `composer-bin-plugin`, the path may be:
     - `Fixture/*.php.inc` - Test fixtures (before/after pairs separated by `-----`)
     - `Fake/*.php` - Fake classes used in tests
     - `config/configured_rule.php` - Test configuration
+
+### Available Rector Rules
+
+| Rule | Purpose |
+|------|---------|
+| `RayDiNamedAnnotationRector` | `@Named("a=foo")` on method → `#[Named('foo')]` on parameters |
+| `SetterToConstructorInjectionRector` | `#[Inject]` setter → constructor injection |
+| `TraitToConstructorInjectionRector` | `use ResourceInject` → constructor injection |
+| `ResourceObjectReturnTypeRector` | `: ResourceObject` / `: self` → `: static` |
 
 ### How RayDiNamedAnnotationRector Works
 

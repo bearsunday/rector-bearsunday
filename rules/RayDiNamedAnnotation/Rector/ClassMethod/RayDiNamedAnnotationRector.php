@@ -93,14 +93,22 @@ CODE_SAMPLE
         $names = $this->parseName($nameString);
         $hasChanged = false;
 
-        foreach ($node->params as $param) {
-            $varName = $param->var->name;
-            if (! isset($names[$varName])) {
-                continue;
-            }
-            $attrGroupsFromNamedAnnotation = $this->attributeGroupFactory->createFromClassWithItems(Named::class, [$names[$varName]]);
+        // Handle single parameter case: @Named("foo") without key=value format
+        if ($names === [] && count($node->params) === 1) {
+            $param = $node->params[0];
+            $attrGroupsFromNamedAnnotation = $this->attributeGroupFactory->createFromClassWithItems(Named::class, [trim($nameString)]);
             $param->attrGroups = array_merge($param->attrGroups, [$attrGroupsFromNamedAnnotation]);
             $hasChanged = true;
+        } else {
+            foreach ($node->params as $param) {
+                $varName = $param->var->name;
+                if (! isset($names[$varName])) {
+                    continue;
+                }
+                $attrGroupsFromNamedAnnotation = $this->attributeGroupFactory->createFromClassWithItems(Named::class, [$names[$varName]]);
+                $param->attrGroups = array_merge($param->attrGroups, [$attrGroupsFromNamedAnnotation]);
+                $hasChanged = true;
+            }
         }
 
         if (! $hasChanged) {
