@@ -12,13 +12,14 @@ use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\NodeVisitor;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 use function array_filter;
 use function array_merge;
-use function array_unshift;
 use function array_values;
 use function assert;
 
@@ -82,14 +83,19 @@ CODE_SAMPLE
      */
     public function getNodeTypes(): array
     {
-        return [Class_::class];
+        return [Class_::class, Use_::class];
     }
 
     /**
-     * @param Class_ $node
+     * @param Class_|Use_ $node
+     * @return Node|Node[]|int|null
      */
-    public function refactor(Node $node): ?Node
+    public function refactor(Node $node): Node|array|int|null
     {
+        if ($node instanceof Use_) {
+            return $this->refactorUse($node);
+        }
+
         assert($node instanceof Class_);
 
         $traitsToRemove = [];
@@ -191,5 +197,17 @@ CODE_SAMPLE
         // Match short name (e.g., "ResourceInject" matches "BEAR\Resource\ResourceInject")
         $shortName = substr($knownTrait, strrpos($knownTrait, '\\') + 1);
         return $usedTrait === $shortName;
+    }
+
+    private function refactorUse(Use_ $node): int|null
+    {
+        foreach ($node->uses as $useUse) {
+            $useName = $useUse->name->toString();
+            if (isset(self::TRAIT_TO_INJECTION[$useName])) {
+                return NodeVisitor::REMOVE_NODE;
+            }
+        }
+
+        return null;
     }
 }

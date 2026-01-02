@@ -22,8 +22,6 @@ class ExistingConstructorClass
 
 namespace Rector\Tests\TraitInjection\Rector\Class_\TraitToConstructorInjectionRector\Fixture;
 
-use BEAR\Resource\ResourceInject;
-
 interface FooInterface {}
 
 class ExistingConstructorClass

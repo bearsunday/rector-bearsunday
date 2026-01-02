@@ -20,8 +20,6 @@ class ResourceInjectClass
 
 namespace Rector\Tests\TraitInjection\Rector\Class_\TraitToConstructorInjectionRector\Fixture;
 
-use BEAR\Resource\ResourceInject;
-
 class ResourceInjectClass
 {
     public function __construct(private readonly \BEAR\Resource\ResourceInterface $resource)
