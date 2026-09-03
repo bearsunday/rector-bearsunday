@@ -37,6 +37,7 @@ final class TraitToConstructorInjectionRector extends AbstractRector
     private const TRAIT_TO_INJECTION = [
         'BEAR\Resource\ResourceInject' => ['BEAR\Resource\ResourceInterface', 'resource'],
         'BEAR\Sunday\Inject\ResourceInject' => ['BEAR\Resource\ResourceInterface', 'resource'],
+        'BEAR\Sunday\Inject\PsrLoggerInject' => ['Psr\Log\LoggerInterface', 'logger'],
         'Ray\Di\InjectorInject' => ['Ray\Di\InjectorInterface', 'injector'],
     ];
 
