@@ -152,6 +152,7 @@ Converts trait-based injection to constructor injection.
 **Supported traits:**
 - `BEAR\Resource\ResourceInject` → `ResourceInterface $resource`
 - `BEAR\Sunday\Inject\ResourceInject` → `ResourceInterface $resource`
+- `BEAR\Sunday\Inject\PsrLoggerInject` → `LoggerInterface $logger`
 - `Ray\Di\InjectorInject` → `InjectorInterface $injector`
 
 **Before:**
